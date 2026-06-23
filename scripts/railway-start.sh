@@ -18,4 +18,5 @@ if ! npx prisma db push --skip-generate; then
 fi
 
 echo "[railway-start] starting next.js on port ${PORT:-3000}..."
-exec npm run start -- -p "${PORT:-3000}" -H "0.0.0.0"
+export HOSTNAME="0.0.0.0"
+exec npx next start -H "0.0.0.0" -p "${PORT:-3000}"

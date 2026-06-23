@@ -8,7 +8,7 @@ COPY prisma ./prisma
 RUN npm ci
 
 COPY . .
-RUN chmod +x scripts/railway-start.sh
+RUN sed -i 's/\r$//' scripts/railway-start.sh && chmod +x scripts/railway-start.sh
 RUN npx prisma generate
 RUN npm run build
 
@@ -21,4 +21,4 @@ RUN mkdir -p /data
 
 EXPOSE 3000
 
-CMD ["/app/scripts/railway-start.sh"]
+CMD ["sh", "/app/scripts/railway-start.sh"]
