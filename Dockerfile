@@ -8,6 +8,7 @@ COPY prisma ./prisma
 RUN npm ci
 
 COPY . .
+RUN chmod +x scripts/railway-start.sh
 RUN npx prisma generate
 RUN npm run build
 
@@ -20,4 +21,4 @@ RUN mkdir -p /data
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma db push && exec npm run start -- -p ${PORT:-3000} -H 0.0.0.0"]
+CMD ["/app/scripts/railway-start.sh"]
