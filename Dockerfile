@@ -4,6 +4,7 @@ WORKDIR /app
 
 # NODE_ENV=production は npm ci の前に置かない（prisma 等の devDependencies が必要）
 COPY package.json package-lock.json ./
+COPY prisma ./prisma
 RUN npm ci
 
 COPY . .
