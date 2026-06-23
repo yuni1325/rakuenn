@@ -79,8 +79,11 @@ Playwright を動かすため **Vercel ではなく Railway（Docker）** を推
 | `DATABASE_URL` | `file:/data/dev.db` |
 | `PLAYWRIGHT_HEADLESS` | `true` |
 | `NODE_ENV` | `production` |
+| `ACCESS_PASSWORD` | 任意のパスワード（自分だけアクセス用） |
 
 `PORT` は Railway が自動設定するので **追加不要** です。
+
+`ACCESS_PASSWORD` を設定すると、サイト全体にベーシック認証がかかります。スマホで URL を開いたときにユーザー名・パスワード入力が求められます（**ユーザー名は何でも可**、パスワードだけ一致すれば OK）。
 
 ### 5. 公開 URL を発行
 
@@ -106,12 +109,49 @@ git commit -m "変更内容"
 git push
 ```
 
+---
+
+## Railway でうまくいかないとき
+
+### 「Deployments」が見つからない
+
+Railway の新しい UI では、**プロジェクト画面の真ん中（キャンバス）** にサービス（箱）が1つ表示されます。
+
+1. https://railway.com/dashboard を開く
+2. プロジェクト名（例: `rakuenn`）をクリック
+3. **キャンバス上のサービス（箱）をクリック**（`rakuenn` や GitHub アイコンの付いたカード）
+4. 右側にパネルが開く → ここに **Deployments** またはビルド状況が出ます
+5. 失敗している行をクリック → **Build Logs** / **Deploy Logs** を確認
+
+別の見方:
+- サービスをクリック → **Observability** タブ → **Logs**
+- 画面上部の **Activity**（時計アイコン）からも履歴が見られる場合があります
+
+### ビルドがそもそも始まらない
+
+次を確認してください。
+
+| 確認項目 | やること |
+|----------|----------|
+| リポジトリ連携 | **New Project** → **GitHub Repo** → `yuni1325/rakuenn` を選び **Deploy Now** |
+| GitHub 権限 | https://github.com/settings/installations で **Railway** に `rakuenn` へのアクセスがあるか |
+| 空のプロジェクト | キャンバスにサービスが無い → **+ New** → **GitHub Repo** で追加 |
+| 手動デプロイ | サービス選択後、右上の **Deploy** ボタンを押す |
+
+### 最初からやり直す場合
+
+1. Railway ダッシュボード → 問題のプロジェクト → **Settings** → 一番下 **Delete Project**
+2. **New Project** → **GitHub Repo**
+3. `yuni1325/rakuenn` を検索して選択
+4. **Deploy Now** をクリック
+5. キャンバス上のサービスをクリックし、ビルドログを見る（5〜15分かかることあり）
+
 ### 注意
 
 - 初回ビルドは Playwright イメージのため **数分** かかります
 - データ取得は1日あたり数十秒〜数分。画面を閉じずに待ってください
 - 1回の取得は最大 31 日まで
-- URL を知っている人は誰でも操作できるため、必要なら後から認証を追加してください
+- `ACCESS_PASSWORD` を設定すれば、URL を知っていてもパスワードなしではアクセスできません
 
 ## 技術スタック
 
