@@ -30,14 +30,18 @@ npm run dev
 ## GitHub へアップロード
 
 1. [GitHub](https://github.com/new) で新しいリポジトリ `rakuenn` を作成（README は追加しない）
-2. プロジェクト直下で:
+2. プロジェクト直下で（`YOUR_GITHUB_USERNAME` を自分の GitHub ユーザー名に置き換え。`<ユーザー名>` はそのまま入力しない）:
 
 ```bash
-git init
-git add .
-git commit -m "Initial commit: Rakuenn slot data scraper"
-git branch -M main
-git remote add origin https://github.com/<あなたのユーザー名>/rakuenn.git
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/rakuenn.git
+git push -u origin main
+```
+
+すでに誤った remote を登録した場合:
+
+```bash
+git remote remove origin
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/rakuenn.git
 git push -u origin main
 ```
 
@@ -45,35 +49,69 @@ git push -u origin main
 
 Playwright を動かすため **Vercel ではなく Railway（Docker）** を推奨します。
 
-### 1. Railway でプロジェクト作成
+### 1. Railway アカウントと連携
 
-1. https://railway.app にログイン
-2. **New Project** → **Deploy from GitHub repo** → `rakuenn` を選択
-3. リポジトリ連携後、自動で Dockerfile からビルドされます
+1. https://railway.app を開き、**GitHub アカウントでログイン**
+2. 初回は GitHub 連携の許可を求められるので **Authorize** する
 
-### 2. 永続ストレージ（SQLite）
+### 2. プロジェクト作成
 
-1. Railway ダッシュボード → サービス → **Volumes**
-2. **Add Volume** … マウントパス: `/data`
-3. 環境変数を設定:
+1. **New Project** をクリック
+2. **GitHub Repo** を選択
+3. リポジトリ一覧から **`yuni1325/rakuenn`** を選ぶ
+4. デプロイが自動で始まる（Dockerfile からビルド、5〜10分かかることがあります）
 
+### 3. 永続ストレージ（データベース用・重要）
+
+再デプロイしてもデータが消えないよう、Volume を設定します。
+
+1. デプロイされた **サービス**（rakuenn）をクリック
+2. 上部タブの **Volumes** を開く
+3. **Add Volume** をクリック
+4. **Mount Path** に `/data` と入力して作成
+
+### 4. 環境変数
+
+同じサービス画面の **Variables** タブで以下を追加（なければ）:
+
+| 変数名 | 値 |
+|--------|-----|
+| `DATABASE_URL` | `file:/data/dev.db` |
+| `PLAYWRIGHT_HEADLESS` | `true` |
+| `NODE_ENV` | `production` |
+
+`PORT` は Railway が自動設定するので **追加不要** です。
+
+### 5. 公開 URL を発行
+
+1. **Settings** タブを開く
+2. **Networking** → **Public Networking** → **Generate Domain**
+3. 表示された URL（例: `https://rakuenn-production-xxxx.up.railway.app`）をコピー
+
+### 6. スマホで開く
+
+1. スマホのブラウザ（Safari / Chrome）で上記 URL を開く
+2. **管理画面**（`/admin`）でデータ取得
+3. **ダッシュボード**（`/dashboard`）で結果を確認
+
+ホーム画面に追加したい場合は、ブラウザの「ホーム画面に追加」でアプリのように使えます。
+
+### デプロイ後のコード更新
+
+ローカルで変更して GitHub に push すると、Railway が自動で再デプロイします。
+
+```bash
+git add .
+git commit -m "変更内容"
+git push
 ```
-DATABASE_URL=file:/data/dev.db
-PLAYWRIGHT_HEADLESS=true
-NODE_ENV=production
-```
-
-### 3. 公開 URL を取得
-
-1. **Settings** → **Networking** → **Generate Domain**
-2. 表示された URL（例: `https://rakuenn-production.up.railway.app`）をスマホのブラウザで開く
-3. **管理画面** からデータ取得、**ダッシュボード** で結果確認
 
 ### 注意
 
-- 1回の取得は最大 31 日まで。日付ごとに約 5 秒の間隔があります
-- アナスロは Cloudflare により連続アクセスが制限されることがあります
-- URL を知っている人は誰でも操作できるため、必要なら Railway の非公開ネットワークや認証の追加を検討してください
+- 初回ビルドは Playwright イメージのため **数分** かかります
+- データ取得は1日あたり数十秒〜数分。画面を閉じずに待ってください
+- 1回の取得は最大 31 日まで
+- URL を知っている人は誰でも操作できるため、必要なら後から認証を追加してください
 
 ## 技術スタック
 
