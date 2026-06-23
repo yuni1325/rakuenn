@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SlotData {
+  id          Int      @id @default(autoincrement())
+  hallId      String
+  date        DateTime
+  machineNo   String
+  machineName String
+  bbCount     Int?
+  rbCount     Int?
+  totalGames  Int?
+  diffMedals  Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([hallId, date, machineNo])
+  @@index([hallId])
+  @@index([date])
+}
+
+model ScrapeLog {
+  id        Int      @id @default(autoincrement())
+  runDate   DateTime
+  startDate DateTime
+  endDate   DateTime
+  success   Boolean
+  message   String
+  createdAt DateTime @default(now())
+}
